@@ -1,24 +1,25 @@
 /*
     ============================================================================
                      DESAFIO CÓDIGO DA ILHA – EDIÇÃO FREE FIRE
-                              Nível Novato: Inventário Básico
+                         Nível Aventureiro: Mochila com Busca
     ============================================================================
     
     Objetivo:
-    - Criar um sistema simples de mochila com até 10 itens.
-    - Permitir adicionar, remover e listar itens.
-    - Praticar o uso de struct, vetores e menus interativos.
+    - Evoluir a mochila do nível novato adicionando busca por nome.
+    - Permitir localizar um item e exibir seus detalhes.
 
-    Funcionalidades:
-    ✔ Adicionar item (nome, tipo, quantidade)
-    ✔ Remover item pelo nome
-    ✔ Listar todos os itens
-    ✔ Menu com do-while e switch
-
+    Funcionalidades Adicionadas:
+    ✔ Busca sequencial por nome (strcmp)
+    ✔ Nova opção no menu: Buscar item
+    ✔ Exibição completa do item encontrado
+    ✔ Mensagem amigável quando não encontra
+    
     Conceitos utilizados:
+    - Vetor estático
     - struct
-    - vetor estático
-    - entrada e saída padrão (scanf / printf)
+    - strcmp
+    - flag de controle
+    - menu interativo
     ============================================================================
 */
 
@@ -34,7 +35,7 @@ typedef struct {
     char nome[30];
     char tipo[20];
     int quantidade;
-    int ativo;  // 1 = ocupado | 0 = vazio
+    int ativo;
 } Item;
 
 // ============================================================================
@@ -43,13 +44,14 @@ typedef struct {
 void adicionarItem(Item mochila[]);
 void removerItem(Item mochila[]);
 void listarItens(Item mochila[]);
+void buscarItem(Item mochila[]);
 void limparBuffer();
 
 // ============================================================================
 // FUNÇÃO PRINCIPAL
 // ============================================================================
 int main() {
-    Item mochila[MAX_ITENS] = {0};  // inicializa todos como vazios
+    Item mochila[MAX_ITENS] = {0};
 
     int opcao;
 
@@ -58,6 +60,7 @@ int main() {
         printf("1 - Adicionar item\n");
         printf("2 - Remover item\n");
         printf("3 - Listar itens\n");
+        printf("4 - Buscar item por nome\n");
         printf("0 - Sair\n");
         printf("Escolha: ");
         scanf("%d", &opcao);
@@ -72,6 +75,9 @@ int main() {
                 break;
             case 3:
                 listarItens(mochila);
+                break;
+            case 4:
+                buscarItem(mochila);
                 break;
             case 0:
                 printf("\nSaindo do sistema...\n");
@@ -91,7 +97,6 @@ int main() {
 void adicionarItem(Item mochila[]) {
     int pos = -1;
 
-    // encontrar espaço vazio
     for (int i = 0; i < MAX_ITENS; i++) {
         if (mochila[i].ativo == 0) {
             pos = i;
@@ -141,7 +146,7 @@ void removerItem(Item mochila[]) {
         }
     }
 
-    printf("Item não encontrado na mochila!\n");
+    printf("Item não encontrado!\n");
 }
 
 // ============================================================================
@@ -169,7 +174,35 @@ void listarItens(Item mochila[]) {
 }
 
 // ============================================================================
-// LIMPAR BUFFER DO TECLADO
+// BUSCAR ITEM POR NOME (Nível Aventureiro)
+// ============================================================================
+void buscarItem(Item mochila[]) {
+    char nomeBusca[30];
+    int encontrado = 0;
+
+    printf("\n--- Buscar Item ---\n");
+    printf("Digite o nome do item: ");
+    fgets(nomeBusca, sizeof(nomeBusca), stdin);
+    nomeBusca[strcspn(nomeBusca, "\n")] = '\0';
+
+    for (int i = 0; i < MAX_ITENS; i++) {
+        if (mochila[i].ativo == 1 && strcmp(mochila[i].nome, nomeBusca) == 0) {
+            encontrado = 1;
+
+            printf("\nItem encontrado!\n");
+            printf("Nome: %s\n", mochila[i].nome);
+            printf("Tipo: %s\n", mochila[i].tipo);
+            printf("Quantidade: %d\n", mochila[i].quantidade);
+            return;
+        }
+    }
+
+    if (!encontrado)
+        printf("\n⚠️  Item não encontrado na mochila.\n");
+}
+
+// ============================================================================
+// LIMPAR BUFFER
 // ============================================================================
 void limparBuffer() {
     int c;
